@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Radek Červenka</title>
+  <meta name="description" content="Radek Červenka – digitální vizitka. Kontakt, LinkedIn a uložení kontaktu do telefonu.">
+  <meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Radek Červenka">
+  <meta property="og:description" content="Digitální vizitka">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2318181B'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='%23fff' text-anchor='middle'%3ER%C4%8C%3C/text%3E%3C/svg%3E">
+  <link rel="preload" as="image" href="img/radek.webp" type="image/webp">
+  <style>
+    /* Design tokeny – Minimalism & Swiss Style (ui-ux-pro-max), monochrom + modrý akcent pro fokus */
+    :root {
+      --bg: #FAFAFA;
+      --fg: #09090B;
+      --muted-fg: #52525B;
+      --card: #FFFFFF;
+      --border: #E4E4E7;
+      --card-hover: #F4F4F5;
+      --primary: #18181B;
+      --on-primary: #FFFFFF;
+      --primary-hover: #27272A;
+      --ring: #2563EB;
+      --glow: rgba(24, 24, 27, .06);
+      --wave: rgba(9, 9, 11, .28);
+      --shadow: 0 1px 2px rgba(9, 9, 11, .05);
+      --spring: cubic-bezier(.34, 1.56, .64, 1);
+      --radius: 14px;
+      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #09090B;
+        --fg: #FAFAFA;
+        --muted-fg: #A1A1AA;
+        --card: #18181B;
+        --border: #27272A;
+        --card-hover: #1F1F23;
+        --primary: #FAFAFA;
+        --on-primary: #09090B;
+        --primary-hover: #E4E4E7;
+        --ring: #60A5FA;
+        --glow: rgba(250, 250, 250, .05);
+        --wave: rgba(250, 250, 250, .3);
+        --shadow: none;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(120% 60% at 50% 0%, var(--glow), transparent 70%),
+        var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      padding:
+        max(32px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+        max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    }
+
+    .card {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Dvě vlny od fotky po načtení – „signál z NFC“, proběhne jednou */
+    .avatar { position: relative; }
+    .avatar::before, .avatar::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1.5px solid var(--wave);
+      opacity: 0;
+      pointer-events: none;
+      animation: wave 1.6s cubic-bezier(.2, .6, .3, 1) .5s both;
+    }
+    .avatar::after { animation-delay: .85s; }
+    @keyframes wave {
+      0%   { opacity: 0; transform: scale(1); }
+      15%  { opacity: 1; }
+      100% { opacity: 0; transform: scale(1.4); }
+    }
+
+    .photo {
+      width: 136px;
+      height: 136px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--border);
+      box-shadow: 0 0 0 1px var(--border), 0 0 0 6px var(--bg), 0 0 0 7px var(--border);
+    }
+    .photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02); /* schová světlý okraj kruhu z původní fotky */
+    }
+
+    h1 {
+      margin: 28px 0 4px;
+      font-size: 30px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .role {
+      margin: 0;
+      color: var(--muted-fg);
+      font-size: 16px;
+    }
+
+    .actions {
+      list-style: none;
+      margin: 36px 0 0;
+      padding: 0;
+      width: 100%;
+      display: grid;
+      gap: 12px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 56px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      box-shadow: var(--shadow);
+      font-size: 17px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color .2s ease, border-color .2s ease, transform .4s var(--spring);
+    }
+    /* Stisk: rychlé zmáčknutí, pružný návrat */
+    .btn:active { transform: scale(.97); transition-duration: .2s, .2s, .08s; }
+    .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .btn--primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--on-primary);
+    }
+    /* Spotify – značková zelená, pilulka, černý text (kontrast 10:1) */
+    .btn--spotify {
+      background: #1ED760;
+      border-color: #1ED760;
+      color: #000;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .btn--spotify svg:first-child { width: 24px; height: 24px; }
+    /* Jednorázový odlesk přes Spotify, aby si ho člověk všiml */
+    .btn--spotify { position: relative; overflow: hidden; }
+    .btn--spotify::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .55) 50%, transparent 65%);
+      transform: translateX(-110%);
+      pointer-events: none;
+      animation: shine 1s ease-in-out .45s both;
+    }
+    @keyframes shine { to { transform: translateX(110%); } }
+    /* OP.GG – jejich modrá, ztmavená kvůli kontrastu bílého textu (4,6:1) */
+    .btn--opgg {
+      background: #4171D6;
+      border-color: #4171D6;
+      color: #FFF;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    /* Poloviční tlačítka vedle sebe */
+    .btn--half { justify-content: center; gap: 10px; padding: 0 12px; }
+    .btn.btn--half span { flex: none; }
+
+    /* Hover jen na zařízeních s myší (na dotyku by „zůstal viset“) */
+    @media (hover: hover) {
+      .btn:hover { background: var(--card-hover); }
+      .btn--primary:hover { background: var(--primary-hover); }
+      .btn--spotify:hover { background: #3BE477; border-color: #3BE477; }
+      .btn--opgg:hover { background: #3A66C4; border-color: #3A66C4; }
+    }
+
+    /* Skryté odkazy pod heslem */
+    .extra { width: 100%; margin-top: 12px; }
+    .lock {
+      width: 100%;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted-fg);
+      font: 600 15px/1 var(--font);
+      cursor: pointer;
+      transition: color .2s ease, border-color .2s ease;
+    }
+    .lock svg { width: 18px; height: 18px; flex: none; }
+    .lock[aria-expanded="true"] { color: var(--fg); border-color: var(--muted-fg); }
+    .lock:focus-visible, .lock-form input:focus-visible, .lock-submit:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+    @media (hover: hover) { .lock:hover { color: var(--fg); border-color: var(--muted-fg); } }
+
+    .lock-form { margin-top: 12px; text-align: left; animation: rise .3s ease both; }
+    .lock-form label { display: block; margin: 0 0 6px 4px; font-size: 14px; font-weight: 600; color: var(--muted-fg); }
+    .lock-row { display: flex; gap: 8px; }
+    .lock-form input {
+      flex: 1;
+      min-width: 0;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--fg);
+      font: 16px var(--font); /* 16 px = iPhone při psaní nezoomuje */
+    }
+    .lock-form input[aria-invalid="true"] { border-color: #DC2626; }
+    .lock-submit {
+      height: 48px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: var(--on-primary);
+      font: 600 15px var(--font);
+      cursor: pointer;
+    }
+    .lock-submit:disabled { opacity: .6; cursor: progress; }
+    .lock-error { min-height: 20px; margin: 6px 0 0 4px; font-size: 14px; color: #DC2626; }
+    @media (prefers-color-scheme: dark) {
+      .lock-error { color: #F87171; }
+      .lock-form input[aria-invalid="true"] { border-color: #F87171; }
+    }
+    .shake { animation: shake .35s ease; }
+    @keyframes shake {
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .extra-links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .extra-links .btn { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; }
+    .extra-links .btn + .btn { animation-delay: .06s; }
+
+    .btn svg { flex: none; width: 22px; height: 22px; }
+    .btn span { flex: 1; text-align: left; }
+    .btn .chev { width: 18px; height: 18px; opacity: .45; transition: transform .25s ease, opacity .25s ease; }
+    .btn:active .chev { transform: translateX(4px); opacity: .9; }
+    @media (hover: hover) {
+      .btn:hover .chev { transform: translateX(4px); opacity: .9; }
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--muted-fg);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translate(-50%, 12px);
+      max-width: calc(100% - 40px);
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* Jemný nástup obsahu */
+    .reveal { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; }
+    .actions li:nth-child(1) { animation-delay: .08s; }
+    .actions li:nth-child(2) { animation-delay: .12s; }
+    .actions li:nth-child(3) { animation-delay: .16s; }
+    .actions li:nth-child(4) { animation-delay: .20s; }
+    .extra.reveal { animation-delay: .24s; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .lock-form, .extra-links .btn, .shake { animation: none; }
+      .btn, .btn .chev, .toast, .lock { transition: none; }
+      .avatar::before, .avatar::after, .btn--spotify::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="avatar reveal">
+      <div class="photo">
+        <picture>
+          <source srcset="img/radek.webp" type="image/webp">
+          <img src="img/radek.jpg" width="192" height="192" alt="Portrét – Radek Červenka" decoding="async" fetchpriority="high">
+        </picture>
+      </div>
+    </div>
+
+    <h1 class="reveal">Radek Červenka</h1>
+    <p class="role reveal">Project Manager · SAP S/4HANA</p>
+
+    <!--
+      ODKAZY: stačí nahradit href="#" skutečnou adresou, např.
+        Uložit kontakt → href="radek-cervenka.vcf"
+        Zavolat        → href="tel:+420123456789"
+        E-mail         → href="mailto:jmeno@example.com"
+        LinkedIn       → href="https://www.linkedin.com/in/…"   (+ target="_blank" rel="noopener")
+      Tlačítko s href="#" jen ukáže hlášku „Odkaz brzy doplním“.
+      Osobní odkazy jsou pod heslem: upravuj zdroj/tajne.html a pak spusť  node zdroj/zamek.mjs <heslo>
+    -->
+    <ul class="actions">
+      <li class="reveal">
+        <a class="btn btn--primary" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+          <span>Uložit kontakt</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </li>
+      <li class="reveal">
+        <a class="btn" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Zavolat</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </li>
+      <li class="reveal">
+        <a class="btn" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>E-mail</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </li>
+      <li class="reveal">
+        <a class="btn" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          <span>LinkedIn</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </li>
+    </ul>
+
+    <section class="extra reveal" aria-label="Osobní odkazy">
+      <button class="lock" id="lockBtn" type="button" aria-expanded="false" aria-controls="lockForm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Osobní odkazy
+      </button>
+      <form class="lock-form" id="lockForm" hidden novalidate>
+        <label for="pw">Heslo</label>
+        <div class="lock-row" id="lockRow">
+          <input id="pw" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" aria-describedby="pwErr">
+          <button class="lock-submit" type="submit">Odemknout</button>
+        </div>
+        <p class="lock-error" id="pwErr" aria-live="polite"></p>
+      </form>
+      <div class="extra-links" id="extraLinks" hidden></div>
+    </section>
+
+    <footer class="reveal">© <span id="year">2026</span> Radek Červenka</footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Zašifrované osobní odkazy (AES-GCM, klíč z hesla přes PBKDF2) – generuje zdroj/zamek.mjs
+    var VAULT = 'IY6caxEjAwlQ3omAxF8GkKl3cv0UNG1NPgvOQd0Ab5+85NotTaXXh4VUrphKEJWXd2b2rH8YPPno4lSCJFLJLM7RE8rE1wQhhWz/bs1fdX3eHGXikJmoSnWe+vvrKT8OijnNNrx7xslFN4kbMQnnk1ODIQ9OTNkugjfjPFQCzT7bOkXlRRHWU+tLli73I/PaUINkzaHE7E4aDaHYtx2vAZZx06I5Ieg3IglWdUpCM60ZvlkLYfT5fPd8aenVzSmqP+mRFUt/5NvdaDUuEGh4KzIqXQocrkHuphkSae8SCTDi69sTWFF2HTqePHyUrC4oOklp1jQItPqIswrRb5o0/mIiYd9XqUvoiD1gdGbonNz1D2T8sP54TS0UjP4bgE131du8yVdxhDvRagYwWm5uSWhiW7gs6aOtg3ZWVAZLlRkQyVQHZ2MzEmcVnqSlpYx+CID/88XiYT9SGJMKIVuLHwUxWz0LZUbqvj1Gxn3d0GmES32I+4oA974D+Kee7zXAx+3bIYjonnvgKmNO4hd+PZ90Gsq8Mk18cIA1ddTJ15x/t4X/xKtFMNWw496ZumdrlqPtfhkcbnh6my5xPfcZATuUQeKm+IFoZlNjNJXoNHJkwvfII1m5FZRpVAoYvNDmnrtGwmxtsnLRghPkphwVytSo1zK9bkZr1QCiqSRTTFK92TKytcFZCkoNA+g9M5meD7EJABu4qDUVQmJpl6E2mOC04GCTYpU/7VBOu22AD9D4ftQ/lPmFAPiP+EON0+idaMOM/hdhdPrrI/DKBeO0kAu+PIcLetbgL0cwrZqMM7FLq7QsWLAyRGVQZUMmBJVK0idjpSyRuJyUG/xCHwRmBkZb9tIW/0HotDVZynuNWneRrvU9AjR56XBD7CvGVxuaH8+uwfLBFEtFECumSUq+y7rvymz2nvz/ZEx7naTTaGcwh3FrnylEPk1jjA1e0DeAVMHI/rdY0eUx/yGAK4dgylac5FhXEsBBQae6b36Dp5Z4j/NOun7FbHEff9qtLEabldwq3hGWh5Trs0F5Diyde18WTv5naVuk3+Jwal3dYvDsAtnogLEYDVc6FSgotji66p8YbcFGx8pk8GFo1ZZLhty31qeM/Syz7MZHXiO3Oy3hNj9IQMyfUlHdbRJoeeSY1p1iNBT3I8kru8tTeVItpSBGCTRQDMunLbS0yOf5W4X9Y7EfHBnmjIytT/5gsF507Ypc9VI5re+tHi6uA2Mojd4xEVgP007sLmZaoJKIGQQvbXa1w7UzuK93gZ4+CTXcUk1LJCKtWwphGbTFQzc2bA5t52wOL0bISCse0aiMZY2RCrmXRCa5XKIcMVB7SzpZIGlN28vlBvi1GfnimPRwLQ2a1smKdjtu8p/9bq0J53InD3PFscPugxagpttcvFWgSTL/gBw5zuLQEPh6hRo+eiZgVe3gK1vlyilY/QNkYtE+f1Yym6LgmIGNG+4O9tGOoDAWzvmvS99gMC93SPvXbkyKlDupJ+h1wJf4jUiqQkCBV34t3maHF7xHkXAr36w5wdpbe9mkk7ZY6ocOz9xWU2gvQ8QtZmDKlW6UORAjP24aFkrNkkfPF16eOIN7icZu4IOxLd8RSVWvVY4IGV7ZnWI3+wZzCbnX5WfAd5r3r8j//vHF1hJoBFpSXM4of8XJbT0uL9nntI71hRARVZNT+jt0b3D8UuN9i/465CE0oW3n+qEqFwQskXuARNbMkEro7k4=';
+
+    (function () {
+      // Tlačítka bez odkazu (href="#") zatím jen ohlásí, že odkaz přibude.
+      var toast = document.getElementById('toast');
+      var timer;
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest('a.btn[href="#"]');
+        if (!a) return;
+        e.preventDefault();
+        toast.textContent = 'Odkaz brzy doplním';
+        toast.classList.add('show');
+        clearTimeout(timer);
+        timer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Odemčení osobních odkazů
+      var lockBtn = document.getElementById('lockBtn');
+      var form = document.getElementById('lockForm');
+      var row = document.getElementById('lockRow');
+      var pw = document.getElementById('pw');
+      var err = document.getElementById('pwErr');
+      var links = document.getElementById('extraLinks');
+
+      lockBtn.addEventListener('click', function () {
+        var open = form.hidden;
+        form.hidden = !open;
+        lockBtn.setAttribute('aria-expanded', String(open));
+        if (open) pw.focus();
+      });
+
+      async function decrypt(password) {
+        var raw = Uint8Array.from(atob(VAULT), function (c) { return c.charCodeAt(0); });
+        var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+        var key = await crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: raw.slice(0, 16), iterations: 200000, hash: 'SHA-256' },
+          base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+        var plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(16, 28) }, key, raw.slice(28));
+        return new TextDecoder().decode(plain);
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var submit = form.querySelector('.lock-submit');
+        submit.disabled = true;
+        err.textContent = '';
+        try {
+          links.innerHTML = await decrypt(pw.value.trim());
+          links.hidden = false;
+          form.hidden = true;
+          lockBtn.hidden = true;
+        } catch (_) {
+          err.textContent = 'Špatné heslo, zkus to znovu.';
+          pw.setAttribute('aria-invalid', 'true');
+          row.classList.remove('shake');
+          void row.offsetWidth;
+          row.classList.add('shake');
+          pw.select();
+        } finally {
+          submit.disabled = false;
+        }
+      });
+      pw.addEventListener('input', function () { pw.removeAttribute('aria-invalid'); err.textContent = ''; });
+      // iOS Safari zobrazí :active (stisk tlačítka) jen s posluchačem dotyku
+      document.addEventListener('touchstart', function () {}, { passive: true });
+    })();
+  </script>
+</body>
+</html>
